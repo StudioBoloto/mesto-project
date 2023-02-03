@@ -1,7 +1,7 @@
-import {addCard} from "./card.js";
+import {addCard} from "./Сard.js";
 import {myConfiguration} from "./constants.js";
-import {handleEscape, closePopup, renderLoading} from "./utils.js";
-import {patchAvatar, patchProfile} from "./api.js"
+import {handleEscape, closePopup, renderLoading} from "./UserInfo.js";
+import {patchAvatar, patchProfile} from "./Api.js"
 
 export {openPopup, editProfile, editAvatar, modalAddCard, modalAddCardForm}
 

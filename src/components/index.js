@@ -1,9 +1,9 @@
 import '../pages/index.css';
-import {createCard, cardsContainer} from "./card.js";
+import {createCard, cardsContainer} from "./Сard.js";
 import {myConfiguration} from "./constants.js";
-import {enableValidation} from "./validate.js"
-import {editProfile, editAvatar} from "./modal.js"
-import {getUserInfo, getInitialCards} from "./api.js";
+import {enableValidation} from "./FormValidator.js"
+import {editProfile, editAvatar} from "./Popup.js"
+import {getUserInfo, getInitialCards} from "./Api.js";
 
 const allPromise = Promise.all([getUserInfo(), getInitialCards()]);
 

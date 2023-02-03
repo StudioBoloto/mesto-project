@@ -1,6 +1,6 @@
-import {openPopup, modalAddCard, modalAddCardForm} from "./modal.js";
-import {deleteCard, pushCard, toggleLike} from "./api.js";
-import {closePopup} from "./utils";
+import {openPopup, modalAddCard, modalAddCardForm} from "./Popup.js";
+import {deleteCard, pushCard, toggleLike} from "./Api.js";
+import {closePopup} from "./UserInfo";
 
 export {addCard, createCard, cardsContainer}
 
