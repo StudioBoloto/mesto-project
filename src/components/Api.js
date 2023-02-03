@@ -1,93 +1,52 @@
-const config = {
-    baseUrl: 'https://nomoreparties.co/v1/plus-cohort-18',
-    headers: {
-        authorization: '63492307-542e-4f00-8b8a-a7276b6e840e',
-        'Content-Type': 'application/json'
+export class Api {
+    constructor({baseUrl, headers}) {
+        this._baseUrl = baseUrl;
+        this._headers = headers;
     }
-}
 
-function checkServerResponse(res) {
-    if (res.ok) {
-        return res.json();
+    _handleResponse(res) {
+        if (res.ok) {
+            return res.json();
+        }
+        return Promise.reject(`Ошибка: ${res.status}`);
     }
-    return Promise.reject(`Ошибка: ${res.status}`);
-}
 
-export const getUserInfo = () => {
-    return fetch(`${config.baseUrl}/users/me`, {
-        headers: config.headers
-    })
-        .then((res) => {
-            return checkServerResponse(res);
-        });
-}
+    _fetch(url, options = {}) {
+        return fetch(`${this._baseUrl}${url}`, {...options, headers: this._headers})
+            .then(res => this._handleResponse(res));
+    }
 
-export const getInitialCards = () => {
-    return fetch(`${config.baseUrl}/cards`, {
-        headers: config.headers
-    })
-        .then((res) => {
-            return checkServerResponse(res);
-        });
-}
+    getUserInfo() {
+        return this._fetch('/users/me');
+    }
 
-export const patchProfile = (profileName, profileTitle) => {
-    return fetch(`${config.baseUrl}/users/me`, {
-        method: 'PATCH',
-        headers: config.headers,
-        body: JSON.stringify({
-            name: profileName,
-            about: profileTitle
-        })
-    })
-        .then((res) => {
-            return checkServerResponse(res);
-        });
-}
+    getInitialCards() {
+        return this._fetch('/cards');
+    }
 
-export const patchAvatar = (avatarLink) => {
-    return fetch(`${config.baseUrl}/users/me/avatar`, {
-        method: 'PATCH',
-        headers: config.headers,
-        body: JSON.stringify({
-            avatar: avatarLink
-        })
-    })
-        .then((res) => {
-            return checkServerResponse(res);
+    patchProfile(data) {
+        return this._fetch('/users/me', {
+            method: 'PATCH', body: JSON.stringify({name: data.author, about: data.about})
         });
-}
+    }
 
-export const pushCard = (cardName, cardLink) => {
-    return fetch(`${config.baseUrl}/cards`, {
-        method: 'POST',
-        headers: config.headers,
-        body: JSON.stringify({
-            name: cardName,
-            link: cardLink
-        })
-    })
-        .then((res) => {
-            return checkServerResponse(res);
+    patchAvatar(data) {
+        return this._fetch('/users/me/avatar', {
+            method: 'PATCH', body: JSON.stringify({avatar: data.link})
         });
-}
+    }
 
-export const deleteCard = (cardId) => {
-    return fetch(`${config.baseUrl}/cards/${cardId}`, {
-        method: 'DELETE',
-        headers: config.headers
-    })
-        .then((res) => {
-            return checkServerResponse(res);
+    pushCard(data) {
+        return this._fetch('/cards', {
+            method: 'POST', body: JSON.stringify({name: data.title, link: data.link})
         });
-}
+    }
 
-export const toggleLike = (cardId, method) => {
-    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
-        method: method,
-        headers: config.headers
-    })
-        .then((res) => {
-            return checkServerResponse(res);
-        });
+    deleteCard(cardId) {
+        return this._fetch(`/cards/${cardId}`, {method: 'DELETE'});
+    }
+
+    toggleLike(cardId, method) {
+        return this._fetch(`/cards/likes/${cardId}`, {method});
+    }
 }
