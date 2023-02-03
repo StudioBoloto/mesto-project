@@ -1,84 +1,81 @@
-import {openPopup, modalAddCard, modalAddCardForm} from "./Popup.js";
-import {deleteCard, pushCard, toggleLike} from "./Api.js";
-import {closePopup} from "./UserInfo";
-
-export {addCard, createCard, cardsContainer}
-
-const modalImage = document.querySelector('#my-popup-image');
-const cardsContainer = document.querySelector('.elements');
-const cardTemplate = document.querySelector('#card-template').content;
-const modalImageName = document.querySelector('.popup__title-image');
-const modalImageLink = document.querySelector('.popup__image');
+import {api, cardTemplate} from "./index.js";
+import {PopupWithImage} from "./PopupWithImage.js";
+import {myConfiguration} from "./constants.js";
 
 
-function createCard(cardName, cardLink, myConfiguration, initialCard) {
-    const cardElement = cardTemplate.querySelector(myConfiguration.elementsCardSelector).cloneNode(true);
-    const modalImageOpen = cardElement.querySelector(myConfiguration.elementImageSelector);
-    const cardElementImage = cardElement.querySelector(myConfiguration.elementsImageSelector);
-    cardElement.querySelector(myConfiguration.elementsTitleSelector).textContent = cardName;
-    const likesCount = cardElement.querySelector(myConfiguration.elementsLikeCountClass);
-
-    const likedUsers = new Set();
-    initialCard.likes.forEach((user) => {
-        likedUsers.add(user._id);
-    });
-
-    likesCount.textContent = initialCard.likes.length;
-    cardElementImage.src = cardLink;
-    cardElementImage.alt = 'Изображение ' + cardName;
-    if (myConfiguration.id !== initialCard.owner._id) {
-        cardElement.querySelector(myConfiguration.deleteButtonSelector).classList.add('elements__trash_inactive');
+export class Ard {
+    constructor(data, selector) {
+        this._data = data;
+        this._selector = selector;
+        this._ownerId = data.owner._id
+        this._likes = data.likes
+        this._likedUsersId = new Set(this._likes.map(user => user._id));
+        this._myId = myConfiguration.id
+        this._handleCardClick = this._handleCardClick.bind(this);
     }
-    if (likedUsers.has(myConfiguration.id)) {
-        cardElement.querySelector(myConfiguration.elementsLikeSelector).classList.add(myConfiguration.elementsLikeActiveClass);
+
+    _isLiked() {
+        return this._likedUsersId.has(this._myId);
     }
-    cardElement.querySelector(myConfiguration.elementsLikeSelector).addEventListener('click', function (evt) {
-        let method = "PUT";
-        if (likedUsers.has(myConfiguration.id)) {
-            method = "DELETE";
-        }
-        toggleLike(initialCard._id, method)
-            .then((result) => {
-                evt.target.classList.toggle(myConfiguration.elementsLikeActiveClass);
-                likesCount.textContent = result.likes.length;
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
 
-    });
-    modalImageOpen.addEventListener('click', function () {
-        openPopup(modalImage, myConfiguration);
-        modalImageLink.src = cardLink;
-        modalImageLink.alt = 'Изображение ' + cardName;
-        modalImageName.textContent = cardName;
-    });
-    cardElement.querySelector(myConfiguration.deleteButtonSelector).addEventListener('click', function () {
-        deleteCard(initialCard._id)
-            .then((result) => {
-                cardElement.remove();
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+    _isNotOwner() {
+        return this._myId !== this._ownerId
+    }
 
-    });
-    return cardElement;
-}
-
-function addCard(cardName, cardLink, myConfiguration) {
-    pushCard(cardName, cardLink)
-        .then((result) => {
-            const cardElement = createCard(cardName, cardLink, myConfiguration, result);
-            cardsContainer.prepend(cardElement);
-            modalAddCardForm.reset();
-            closePopup(modalAddCard, myConfiguration);
-            console.log(result);
-        })
-        .catch((err) => {
-            console.log(err);
+    _createElements() {
+        const cardElement = cardTemplate.querySelector(this._selector).cloneNode(true);
+        cardElement.querySelector(myConfiguration.elementsTitleSelector).textContent = this._data.name;
+        cardElement.querySelector(myConfiguration.elementsImageSelector).src = this._data.link;
+        cardElement.querySelector(myConfiguration.elementsImageSelector).alt = 'Изображение ' + this._data.name;
+        cardElement.querySelector(myConfiguration.elementsLikeCountClass).textContent = this._likes.length;
+        if (this._isNotOwner()) cardElement.querySelector(myConfiguration.deleteButtonSelector).classList.add(myConfiguration.inactiveTrashClass);
+        if (this._isLiked()) cardElement.querySelector(myConfiguration.elementsLikeSelector).classList.add(myConfiguration.elementsLikeActiveClass);
+        cardElement.querySelector(myConfiguration.elementImageSelector).addEventListener("click", this._handleCardClick);
+        cardElement.querySelector(myConfiguration.deleteButtonSelector).addEventListener("click", () => {
+            this._handleCardDelete(this);
         });
 
+        cardElement.querySelector(myConfiguration.elementsLikeSelector).addEventListener('click', () => {
+            this._handleCardLike(this);
+        });
+
+        this.cardElement = cardElement;
+        return cardElement;
+    }
+
+    _handleCardClick() {
+        const popupInstance = new PopupWithImage(myConfiguration.popupImageSelector, this._data.link, this._data.name);
+        popupInstance.setEventListeners();
+        popupInstance.open();
+    }
+
+    _handleCardLike(cardInstance) {
+        let method = "PUT";
+        if (this._isLiked()) method = "DELETE";
+        api.toggleLike(cardInstance._data._id, method)
+            .then((result) => {
+                this.cardElement.querySelector(myConfiguration.elementsLikeSelector).classList.toggle(myConfiguration.elementsLikeActiveClass);
+                this.cardElement.querySelector(myConfiguration.elementsLikeCountClass).textContent = result.likes.length;
+                this._likedUsersId = new Set(result.likes.map(user => user._id));
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+    _handleCardDelete(cardInstance) {
+        api.deleteCard(cardInstance._data._id)
+            .then(result => {
+                this.cardElement.remove();
+                console.log(result);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
+    createCard() {
+        return this._createElements();
+    }
 }
