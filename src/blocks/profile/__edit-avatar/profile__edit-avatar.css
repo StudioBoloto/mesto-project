@@ -1,0 +1,13 @@
+.profile__edit-avatar {
+    background: none;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    position: absolute;
+}
+
+.profile__edit-avatar:hover {
+    background: rgba(0, 0, 0, 0.8) url(../../../images/edit-avatar/edit-avatar.svg) no-repeat center;
+    object-fit: cover;
+    cursor: pointer;
+}

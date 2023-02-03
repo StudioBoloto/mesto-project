@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesto</title>
+</head>
+<body>
+<div class="page">
+    <header class="header">
+        <div class="header__logo"></div>
+    </header>
+    <main class="content">
+        <section class="profile">
+            <div class="profile__edit-avatar" id="avatar-image"></div>
+            <img src="<%=require('./images/avatar/avatar.svg')%>" alt="Аватар" class="profile__avatar">
+            <div class="profile__info">
+                <h1 class="profile__author">Жак-Ив Кусто</h1>
+                <button type="button" class="profile__edit-button" id="btn-open-edit"></button>
+                <p class="profile__about">Исследователь океана</p>
+            </div>
+            <button type="button" class="profile__add-button" id="btnOpenAdd"></button>
+        </section>
+        <section class="elements">
+            <template id="card-template">
+                <div class="elements__card">
+                    <button type="button" class="elements__trash" id="delete-button"></button>
+                    <img src="" alt=""
+                         class="elements__image" id="element-image">
+                    <div class="elements__wrapper">
+                        <h2 class="elements__title"></h2>
+                        <button type="button" class="elements__like">
+                        </button>
+                    </div>
+                    <div class="elements__like-counter-wrapper">
+                        <span class="elements__like-counter">2</span>
+                    </div>
+                </div>
+            </template>
+        </section>
+    </main>
+    <footer class="footer">
+        <p class="footer__copyright">&copy; 2020 Mesto Russia</p>
+    </footer>
+    <div class="popup" id="myPopupEdit">
+        <div class="popup__container">
+            <button type="button" class="popup__close-button" id="btnCloseEdit"></button>
+            <h2 class="popup__title">Редактировать профиль</h2>
+            <form class="popup__form" name="profile-edit-form" id="popupEditProfile">
+                <label class="popup__label">
+                    <input name="author" type="text" placeholder="Имя" class="popup__input" id="edit-profile-name"
+                           required data-empty-error="Вы пропустили это поле."
+                           data-symbols-error="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы."
+                           data-length-error="Минимальное количество символов: 2. Длина текста сейчас: 1 символ."
+                           minlength="2" maxlength="40">
+                    <span class="popup__input_error edit-profile-name-error"></span>
+                </label>
+                <label class="popup__label">
+                    <input name="about" type="text" placeholder="Вид деятельности" class="popup__input"
+                           id="edit-profile-title" required minlength="2" maxlength="200"
+                           data-empty-error="Вы пропустили это поле."
+                           data-symbols-error="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы."
+                           data-length-error="Минимальное количество символов: 2. Длина текста сейчас: 1 символ.">
+                    <span class="popup__input_error edit-profile-title-error"></span>
+                </label>
+                <button type="submit" class="popup__save-button" id="btn-submit-edit">Сохранить</button>
+            </form>
+        </div>
+    </div>
+    <div class="popup" id="myPopupAdd">
+        <div class="popup__container">
+            <button type="button" class="popup__close-button" id="btnCloseAdd"></button>
+            <h2 class="popup__title">Новое место</h2>
+            <form class="popup__form" name="add-card-form" id="popupAddCard">
+                <label class="popup__label">
+                    <input name="title" type="text" placeholder="Название" class="popup__input" id="add-card-title"
+                           minlength="2" maxlength="30" required data-empty-error="Вы пропустили это поле."
+                           data-symbols-error="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы."
+                           data-length-error="Минимальное количество символов: 2. Длина текста сейчас: 1 символ.">
+                    <span class="popup__input_error add-card-title-error"></span>
+                </label>
+                <label class="popup__label">
+                    <input name="link" type="url" placeholder="Ссылка на картинку" class="popup__input"
+                           id="add-card-link"
+                           required data-url-error="Введите адрес сайта."
+                    >
+                    <span class="popup__input_error add-card-link-error"></span>
+                </label>
+                <label class="popup__save-button-add-card">
+                    <button type="submit" class="popup__save-button" id="btn-submit-add">Создать</button>
+                </label>
+            </form>
+        </div>
+    </div>
+    <div class="popup" id="my-popup-image">
+        <div class="popup__container-image">
+            <button type="button" class="popup__close-button popup__close-button-image" id="btn-close-image"></button>
+            <img src="" alt="" class="popup__image">
+            <h2 class="popup__title-image">Новое место</h2>
+        </div>
+    </div>
+    <div class="popup" id="myPopupAvatar">
+        <div class="popup__container">
+            <button type="button" class="popup__close-button" id="btnCloseAvatar"></button>
+            <h2 class="popup__title">Обновить аватар</h2>
+            <form class="popup__form" name="edit-avatar-form" id="popupAvatar">
+                <label class="popup__label">
+                    <input name="link" type="url" placeholder="Ссылка на картинку" class="popup__input"
+                           id="avatar-link"
+                           required data-url-error="Введите адрес сайта."
+                    >
+                    <span class="popup__input_error avatar-link-error"></span>
+                </label>
+                <label class="popup__save-button-add-card">
+                    <button type="submit" class="popup__save-button" id="btn-submit-avatar">Создать</button>
+                </label>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,8 @@
+.elements__card {
+    background: #FFFFFF;
+    border-radius: 10px;
+    overflow: hidden;
+    align-self: center;
+    justify-self: center;
+    position: relative;
+}
