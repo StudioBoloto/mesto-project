@@ -1,4 +1,4 @@
-import {myConfiguration} from "./constants.js";
+import {myConfiguration} from "../utils/constants.js";
 
 
 export class Popup {
@@ -17,7 +17,10 @@ export class Popup {
         document.removeEventListener('keydown', this._handleEscClose);
     }
 
-    setEventListeners() {
+    setEventListeners(addButtonSelector=null) {
+        if (addButtonSelector) {
+            document.querySelector(addButtonSelector).addEventListener('click', () => this.open());
+        }
         this._element.addEventListener("mousedown", evt => {
             if (evt.target.classList.contains(myConfiguration.openedPopupClass)) {
                 this.close();
@@ -32,9 +35,5 @@ export class Popup {
         if (evt.key === 'Escape') {
             this.close();
         }
-    }
-
-    _renderLoading(buttonLabel) {
-        this._element.querySelector(myConfiguration.submitButtonSelector).textContent = buttonLabel;
     }
 }

@@ -53,7 +53,7 @@ export class FormValidator {
 
     _setEventListeners() {
         const inputList = Array.from(this._formElement.querySelectorAll(this._myConfiguration.inputSelector));
-        const buttonElement = this._formElement.querySelector(this._myConfiguration.submitButtonSelector);
+        const buttonElement = this._formElement.querySelector(this._myConfiguration.submitButtonClass);
 
         this._toggleButtonState(inputList, buttonElement);
 

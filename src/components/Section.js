@@ -5,8 +5,14 @@ export class Section {
         this._container = document.querySelector(containerSelector);
     }
 
-    addItem(element, isFirst=false) {
-        isFirst? this._container.prepend(element) : this._container.append(element);
+    addItem(element, apiData = null) {
+        if (apiData) {
+            this._renderedItems.push(apiData);
+            this._container.prepend(element);
+
+        } else {
+            this._container.append(element);
+        }
     }
 
     renderItems() {
