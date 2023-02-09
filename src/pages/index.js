@@ -28,14 +28,7 @@ allPromise.then(([userProfile, initialCards]) => {
 
     cardsContainer = new Section({
         data: initialCards, renderer: (item) => {
-            const card = new Card(item,
-                myConfiguration.cardTemplateSelector,
-                handleCardClick,
-                handleCardDelete,
-                handleCardLike,
-                myConfiguration,
-            );
-            const cardElement = card.createCard();
+            const cardElement = createCard(item);
             cardsContainer.addItem(cardElement);
         }
     }, myConfiguration.cardsContainerClass);
@@ -46,20 +39,23 @@ allPromise.then(([userProfile, initialCards]) => {
         console.log(err);
     });
 
+function createCard(item) {
+    const card = new Card(item,
+        myConfiguration.cardTemplateSelector,
+        handleCardClick,
+        handleCardDelete,
+        handleCardLike,
+        myConfiguration,
+    );
+    return card.createCard();
+}
+
 function addCard(data) {
     return api.pushCard(data)
         .then((result) => {
-            const card = new Card(result,
-                myConfiguration.cardTemplateSelector,
-                handleCardClick,
-                handleCardDelete,
-                handleCardLike,
-                myConfiguration,
-            );
-            const cardElement = card.createCard();
+            const cardElement = createCard(result);
             cardsContainer.addItem(cardElement, result);
             cardsContainer.renderItems();
-            console.log(result);
             return Promise.resolve(result);
         })
         .catch((err) => {
@@ -68,9 +64,11 @@ function addCard(data) {
         });
 }
 
+
+const popupInstance = new PopupWithImage(myConfiguration.popupImageForm);
+popupInstance.setEventListeners();
+
 export function handleCardClick(cardInstance) {
-    const popupInstance = new PopupWithImage(myConfiguration.popupImageForm);
-    popupInstance.setEventListeners();
     popupInstance.open(cardInstance._data.link, cardInstance._data.name);
 }
 
@@ -149,6 +147,15 @@ popupsWithForm.forEach((popup) => {
                 return popupWithForm;
         }
     })();
-
-    popupInstanceWithForm.setEventListeners(addButtonSelector);
+    document.querySelector(addButtonSelector).addEventListener('click', () => {
+        if (addButtonSelector === myConfiguration.editButtonClass) {
+            const inputUserInfo = userInfo.getUserInfo();
+            const inputUserName = document.querySelector(myConfiguration.editProfileAuthorInput);
+            const inputUserTitle = document.querySelector(myConfiguration.editProfileAboutInput);
+            inputUserName.value = inputUserInfo.name;
+            inputUserTitle.value = inputUserInfo.about;
+        }
+        popupInstanceWithForm.open()
+    });
+    popupInstanceWithForm.setEventListeners();
 });

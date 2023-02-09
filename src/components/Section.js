@@ -7,7 +7,6 @@ export class Section {
 
     addItem(element, apiData = null) {
         if (apiData) {
-            this._renderedItems.push(apiData);
             this._container.prepend(element);
 
         } else {
