@@ -12,6 +12,8 @@ import {myConfiguration} from "../utils/constants.js";
 
 const popups = document.querySelectorAll(myConfiguration.popupClass);
 const popupsWithForm = Array.from(popups).filter(popup => popup.querySelector(myConfiguration.formSelector));
+const inputUserName = document.querySelector(myConfiguration.editProfileAuthorInput);
+const inputUserTitle = document.querySelector(myConfiguration.editProfileAboutInput);
 
 
 export const api = new Api(myConfiguration.apiConfig);
@@ -55,7 +57,6 @@ function addCard(data) {
         .then((result) => {
             const cardElement = createCard(result);
             cardsContainer.addItem(cardElement, result);
-            cardsContainer.renderItems();
             return Promise.resolve(result);
         })
         .catch((err) => {
@@ -86,7 +87,7 @@ export function handleCardLike(cardInstance, method) {
 export function handleCardDelete(cardInstance) {
     api.deleteCard(cardInstance.getCardId())
         .then(result => {
-            this._cardElement.remove();
+            cardInstance.removeCard();
             console.log(result);
         })
         .catch(err => {
@@ -150,8 +151,6 @@ popupsWithForm.forEach((popup) => {
     document.querySelector(addButtonSelector).addEventListener('click', () => {
         if (addButtonSelector === myConfiguration.editButtonClass) {
             const inputUserInfo = userInfo.getUserInfo();
-            const inputUserName = document.querySelector(myConfiguration.editProfileAuthorInput);
-            const inputUserTitle = document.querySelector(myConfiguration.editProfileAboutInput);
             inputUserName.value = inputUserInfo.name;
             inputUserTitle.value = inputUserInfo.about;
         }

@@ -53,7 +53,7 @@ export class Card {
         });
     }
 
-    getCardId(){
+    getCardId() {
         return this._data._id;
     }
 
@@ -65,5 +65,9 @@ export class Card {
 
     createCard() {
         return this._createElements();
+    }
+
+    removeCard() {
+        this._cardElement.remove();
     }
 }
