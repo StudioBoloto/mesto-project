@@ -1,96 +1,96 @@
-export {hasInvalidInput, setEventListeners, enableValidation};
-
-const showInputError = (formElement, inputElement, errorMessage, myConfiguration) => {
-    const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-    inputElement.classList.add(myConfiguration.inputInvalidSelector);
-    errorElement.textContent = errorMessage;
-    errorElement.classList.add(myConfiguration.inputErrorSelector);
-};
-
-const hideInputError = (formElement, inputElement, myConfiguration) => {
-    const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-    inputElement.classList.remove(myConfiguration.inputInvalidSelector);
-    errorElement.classList.remove(myConfiguration.inputErrorSelector);
-    errorElement.textContent = '';
-};
-
-function isValidHttpUrl(string) {
-    let url;
-    try {
-        url = new URL(string);
-    } catch (_) {
-        return false;
+export class FormValidator {
+    constructor(myConfiguration, formElement) {
+        this._myConfiguration = myConfiguration;
+        this._formElement = formElement;
     }
-    return url.protocol === "http:" || url.protocol === "https:";
-}
 
-function isValidString(string) {
-    let re = new RegExp(/^[\p{Script=Latin}\p{Script=Cyrl}\s\-]*$/u);
-    return re.test(string);
-}
-
-const checkInputValidity = (formElement, inputElement, myConfiguration) => {
-    if (inputElement.type === "url" && !isValidHttpUrl(inputElement.value)) {
-        inputElement.setCustomValidity(inputElement.dataset.urlError);
-        showInputError(formElement, inputElement, inputElement.validationMessage, myConfiguration);
-    } else if (inputElement.validity.valueMissing) {
-        inputElement.setCustomValidity(inputElement.dataset.emptyError);
-        showInputError(formElement, inputElement, inputElement.validationMessage, myConfiguration);
-    } else if (inputElement.type !== "url" && !isValidString(inputElement.value)) {
-        inputElement.setCustomValidity(inputElement.dataset.symbolsError);
-        showInputError(formElement, inputElement, inputElement.validationMessage, myConfiguration);
-    } else if (inputElement.validity.tooShort) {
-        inputElement.setCustomValidity(inputElement.dataset.lengthError);
-        showInputError(formElement, inputElement, inputElement.validationMessage, myConfiguration);
-    } else {
-        inputElement.setCustomValidity("");
-        hideInputError(formElement, inputElement, myConfiguration);
+    _showInputError(inputElement) {
+        const errorElement = this._formElement.querySelector(`.${inputElement.id}-error`);
+        inputElement.classList.add(this._myConfiguration.inputInvalidSelector);
+        errorElement.textContent = inputElement.validationMessage;
+        errorElement.classList.add(this._myConfiguration.inputErrorSelector);
     }
-};
 
-function hasInvalidInput(inputList) {
-    return inputList.some((inputElement) => {
-        return !inputElement.validity.valid;
-    });
-}
-
-function toggleButtonState(inputList, buttonElement, myConfiguration) {
-    if (hasInvalidInput(inputList)) {
-        buttonElement.classList.add(myConfiguration.inactiveButtonClass);
-        buttonElement.setAttribute('disabled', 'disabled');
-    } else {
-        buttonElement.classList.remove(myConfiguration.inactiveButtonClass);
-        buttonElement.removeAttribute('disabled');
+    _hideInputError(inputElement) {
+        const errorElement = this._formElement.querySelector(`.${inputElement.id}-error`);
+        inputElement.classList.remove(this._myConfiguration.inputInvalidSelector);
+        errorElement.classList.remove(this._myConfiguration.inputErrorSelector);
+        errorElement.textContent = '';
     }
-}
 
-const setEventListeners = (formElement, myConfiguration) => {
-    const inputList = Array.from(formElement.querySelectorAll(myConfiguration.inputSelector));
-    const buttonElement = formElement.querySelector(myConfiguration.submitButtonSelector);
+    _isValidHttpUrl(string) {
+        try {
+            const url = new URL(string);
+            return url.protocol === "http:" || url.protocol === "https:";
+        } catch (_) {
+            return false;
+        }
+    }
 
-    toggleButtonState(inputList, buttonElement, myConfiguration);
+    _isValidString(string) {
+        let re = new RegExp(/^[\p{Script=Latin}\p{Script=Cyrl}\s\-]*$/u);
+        return re.test(string);
+    }
 
-    formElement.addEventListener('reset', () => {
-        setTimeout(() => {
-            buttonElement.textContent = "Сохранение...";
-            toggleButtonState(inputList, buttonElement, myConfiguration);
-        }, 0);
-    });
+    _checkInputValidity(inputElement) {
+        if (inputElement.type === "url" && !this._isValidHttpUrl(inputElement.value)) {
+            inputElement.setCustomValidity(inputElement.dataset.urlError);
+            this._showInputError(inputElement);
+        } else if (inputElement.validity.valueMissing) {
+            inputElement.setCustomValidity(inputElement.dataset.emptyError);
+            this._showInputError(inputElement);
+        } else if (inputElement.type !== "url" && !this._isValidString(inputElement.value)) {
+            inputElement.setCustomValidity(inputElement.dataset.symbolsError);
+            this._showInputError(inputElement);
+        } else if (inputElement.validity.tooShort) {
+            inputElement.setCustomValidity(inputElement.dataset.lengthError);
+            this._showInputError(inputElement);
+        } else {
+            inputElement.setCustomValidity("");
+            this._hideInputError(inputElement);
+        }
+    }
 
-    inputList.forEach((inputElement) => {
-        inputElement.addEventListener('input', function () {
-            checkInputValidity(formElement, inputElement, myConfiguration);
-            toggleButtonState(inputList, buttonElement, myConfiguration);
+    _setEventListeners() {
+        const inputList = Array.from(this._formElement.querySelectorAll(this._myConfiguration.inputSelector));
+        const buttonElement = this._formElement.querySelector(this._myConfiguration.submitButtonClass);
+
+        this._toggleButtonState(inputList, buttonElement);
+
+        this._formElement.addEventListener('reset', () => {
+            setTimeout(() => {
+                inputList.forEach((inputElement) => {
+                    this._hideInputError(inputElement);
+                });
+                this._toggleButtonState(inputList, buttonElement, this._myConfiguration);
+            }, 0);
         });
-    });
-};
 
-const enableValidation = (myConfiguration) => {
-    const formList = Array.from(document.querySelectorAll(myConfiguration.formSelector));
-    formList.forEach((formElement) => {
-        formElement.addEventListener('submit', function (evt) {
-            evt.preventDefault();
+        inputList.forEach((inputElement) => {
+            inputElement.addEventListener("input", () => {
+                this._checkInputValidity(inputElement);
+                this._toggleButtonState(inputList, buttonElement);
+            });
         });
-        setEventListeners(formElement, myConfiguration);
-    });
-};
+    }
+
+    enableValidation() {
+        this._setEventListeners();
+    }
+
+    _hasInvalidInput(inputList) {
+        return inputList.some((inputElement) => {
+            return !inputElement.validity.valid;
+        });
+    }
+
+    _toggleButtonState(inputList, buttonElement) {
+        if (this._hasInvalidInput(inputList)) {
+            buttonElement.classList.add(this._myConfiguration.inactiveButtonClass);
+            buttonElement.setAttribute('disabled', 'disabled');
+        } else {
+            buttonElement.classList.remove(this._myConfiguration.inactiveButtonClass);
+            buttonElement.removeAttribute('disabled');
+        }
+    }
+}

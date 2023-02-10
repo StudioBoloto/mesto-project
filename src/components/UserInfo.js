@@ -1,20 +1,28 @@
-import {myConfiguration} from "./constants";
-
-export {handleEscape, closePopup, renderLoading}
-
-function closePopup(popup, myConfiguration) {
-    popup.classList.remove(myConfiguration.openedPopupClass);
-    document.removeEventListener('keydown', handleEscape);
-
-}
-
-function handleEscape(evt) {
-    if (evt.key === 'Escape') {
-        const openedPopup = document.querySelector('.popup_opened');
-        closePopup(openedPopup, myConfiguration);
+export class UserInfo {
+    constructor(nameSelector, aboutSelector, avatarSelector) {
+        this._nameElement = document.querySelector(nameSelector);
+        this._aboutElement = document.querySelector(aboutSelector);
+        this._avatarElement = document.querySelector(avatarSelector);
     }
-}
 
-function renderLoading(popup, buttonLabel) {
-    popup.querySelector(myConfiguration.submitButtonSelector).textContent = buttonLabel;
+    getUserInfo() {
+        return {
+            name: this._nameElement.textContent,
+            about: this._aboutElement.textContent
+        }
+    }
+
+    getUserId() {
+        return this._id;
+    }
+
+    setUserInfo({name, about, avatar, _id}) {
+        this._name = name;
+        this._about = about;
+        this._avatar = avatar;
+        this._id = _id;
+        this._nameElement.textContent = this._name;
+        this._aboutElement.textContent = this._about;
+        this._avatarElement.src = this._avatar;
+    }
 }
